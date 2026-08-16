@@ -47,13 +47,13 @@ export default function KidDashboard({
         <ScreenCard account={account} big />
       </div>
 
-      {account.next_day_interest_cents > 0 && (
+      {account.next_year_interest_cents > 0 && (
         <div className="card flex items-center gap-4 !bg-mintsoft !ring-mint/20">
           <Piggy mood="happy" size={72} animate={false} />
           <p className="font-bold">
-            Your money is growing! 🌱 Every day you get a little extra — tomorrow{" "}
-            <span className="text-mint-deep">+{formatMoney(account.next_day_interest_cents)}</span> just for
-            saving!
+            Your money is growing! 🌱 Just for saving, by next week you'll have{" "}
+            <span className="text-mint-deep">+{formatMoney(account.next_week_interest_cents)}</span> — and{" "}
+            <span className="text-mint-deep">+{formatMoney(account.next_year_interest_cents)}</span> by next year!
           </p>
         </div>
       )}

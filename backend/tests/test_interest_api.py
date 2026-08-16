@@ -28,7 +28,11 @@ def test_interest_appears_on_read(client, admin_headers, make_kid):
     data = r.json()
     expected = int(10000 * ((1 + 6.7 / 100 / 365) ** 10 - 1))
     assert data["money_cents"] == 10000 + expected
-    assert data["next_day_interest_cents"] == math.floor(10000 * (6.7 / 100 / 365))
+    # projections are computed on the post-accrual balance
+    balance = 10000 + expected
+    assert data["next_day_interest_cents"] == math.floor(balance * (6.7 / 100 / 365))
+    assert data["next_week_interest_cents"] == math.floor(balance * ((1 + 6.7 / 100 / 365) ** 7 - 1))
+    assert data["next_year_interest_cents"] == math.floor(balance * ((1 + 6.7 / 100 / 365) ** 365 - 1))
     # ledger has the interest row
     rows = client.get(f"/api/v1/accounts/{acct}/transactions", headers=admin_headers).json()
     interest_rows = [t for t in rows if t["kind"] == "interest"]

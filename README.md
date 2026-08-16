@@ -6,6 +6,16 @@ minutes, or borrow against their future allowance).
 
 ![stack](https://img.shields.io/badge/python-FastAPI-blue) ![db](https://img.shields.io/badge/db-SQLite-green) ![fe](https://img.shields.io/badge/frontend-Vite%20%2B%20React%20%2B%20TS-teal) ![tests](https://img.shields.io/badge/tests-87%20passing-brightgreen)
 
+**Desktop — the teen dashboard** (balances, sparklines, live peak/off-peak exchange rate, convert & borrow):
+
+![Desktop dashboard](docs/screenshots/desktop-dashboard.png)
+
+**Mobile — same kid, same bank, on a phone** (bottom tab bar, stacked cards):
+
+<p align="center">
+  <img src="docs/screenshots/mobile-dashboard.png" alt="Mobile dashboard" width="280">
+</p>
+
 ## What's inside
 
 - **Money bank** — deposits, withdrawals, daily compound interest (default **6.7% APR**), full append-only ledger.
@@ -73,6 +83,19 @@ python -m mommybank.mcp_server     # stdio transport
 
 Client config snippet + tool list: [plan/api.md](plan/api.md#mcp-server).
 
+### …or install the ZCode plugin (marketplace format)
+
+This repo doubles as a **plugin marketplace**: `.claude-plugin/marketplace.json`
+lists the [`plugins/mommy-bank`](plugins/mommy-bank/) plugin, which bundles the
+`mommybank` MCP server **plus** the `mommy-bank-control` skill — an operator
+manual that teaches any AI agent how to run the bank (units, permissions,
+recipes, gotchas).
+
+**Install**: ZCode → Settings → Plugin Management → Discover → **+** → add
+`https://github.com/hevangel/mommy_bank` → **Get** on *mommy-bank*. Requires the
+`mommybank` package importable (`pip install ./backend`) and the bank running.
+Details: [plugins/mommy-bank/README.md](plugins/mommy-bank/README.md).
+
 ## Tests & QA
 
 ```bash
@@ -87,6 +110,13 @@ Browser QA report (13 scripted GUI test points, screenshots): [qa/QA_REPORT.md](
 Everything lives in [`plan/`](plan/): master plan, architecture, database schema,
 API/CLI/MCP reference, UX design, testing strategy, and the EC2 + Cloudflare
 (Gmail login) production guide.
+
+## Contributing
+
+This is an **AI-implemented, human-directed** open-source project: humans open
+issues, review, and merge; AI agents write the code. Standard PR process — see
+[CONTRIBUTING.md](CONTRIBUTING.md), and [`AGENTS.md`](AGENTS.md) if you're the
+AI agent doing the implementing.
 
 ## Security notes
 

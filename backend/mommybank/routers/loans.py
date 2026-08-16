@@ -30,7 +30,7 @@ def borrow(
     db: Session = Depends(get_db),
 ):
     account = _account_for(db, user, body.account_id)
-    loan = loans_svc.borrow(db, account, body.amount_cents, user)
+    loan = loans_svc.borrow(db, account, body.amount_cents, user, note=body.note)
     db.commit()
     return loan_dict(loan)
 
@@ -47,7 +47,7 @@ def repay(
         raise HTTPException(status_code=404, detail="Loan not found")
     if not user.is_admin and loan.account.user_id != user.id:
         raise HTTPException(status_code=403, detail="Not your account")
-    repaid = loans_svc.repay(db, loan, body.amount_cents, user)
+    repaid = loans_svc.repay(db, loan, body.amount_cents, user, note=body.note)
     db.commit()
     return {"repaid_cents": repaid, "loan": loan_dict(loan)}
 

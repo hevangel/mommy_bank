@@ -113,16 +113,16 @@ def mommybank_quote() -> dict:
 
 
 @mcp.tool()
-def mommybank_borrow(username: str, amount_cents: int) -> dict:
+def mommybank_borrow(username: str, amount_cents: int, note: str = "") -> dict:
     """Open a loan: adds money now, accrues interest at the borrow APR."""
     client = _client_ready()
-    return client.borrow(client.account_id(username), amount_cents)
+    return client.borrow(client.account_id(username), amount_cents, note)
 
 
 @mcp.tool()
-def mommybank_repay(loan_id: int, amount_cents: int) -> dict:
+def mommybank_repay(loan_id: int, amount_cents: int, note: str = "") -> dict:
     """Repay a loan (partial allowed, capped by balance and debt)."""
-    return _client_ready().repay(loan_id, amount_cents)
+    return _client_ready().repay(loan_id, amount_cents, note)
 
 
 @mcp.tool()

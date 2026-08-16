@@ -110,6 +110,8 @@ def account_view(db: Session, account: Account, now=None) -> dict:
     data = {
         **account_dict(account),
         "next_day_interest_cents": interest.next_day_interest_cents(account.money_cents, apr),
+        "next_week_interest_cents": interest.compound_interest_cents(account.money_cents, apr, 7),
+        "next_year_interest_cents": interest.compound_interest_cents(account.money_cents, apr, 365),
         "savings_apr_percent": apr,
         "debt_cents": debt,
         "active_loans": len(active_loans),

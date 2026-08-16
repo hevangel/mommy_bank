@@ -143,7 +143,8 @@ def balance(username: str = typer.Argument(None)):
         typer.echo(
             f"{a['avatar']} {a['display_name']:<18} money {_fmt_money(a['money_cents']):>10}  "
             f"screen {_fmt_dur(a['screen_seconds']):>8}  "
-            f"(tomorrow +{_fmt_money(a['next_day_interest_cents'])} interest)"
+            f"(next week +{_fmt_money(a['next_week_interest_cents'])}, "
+            f"next year +{_fmt_money(a['next_year_interest_cents'])} interest)"
         )
 
 
@@ -273,11 +274,16 @@ def convert(
 
 
 @app.command()
-def borrow(username: str, amount: str = typer.Option("", "--amount", "-a"), cents: int = typer.Option(0, "--cents")):
+def borrow(
+    username: str,
+    amount: str = typer.Option("", "--amount", "-a"),
+    cents: int = typer.Option(0, "--cents"),
+    note: str = typer.Option("", "--note", "-n"),
+):
     """Borrow money (opens a loan at the borrow APR)."""
     client = _load_client()
     try:
-        loan = client.borrow(client.account_id(username), _amount_cents(amount, cents))
+        loan = client.borrow(client.account_id(username), _amount_cents(amount, cents), note)
     except (ApiError, ValueError) as e:
         _die(e)
     typer.secho(
@@ -288,11 +294,16 @@ def borrow(username: str, amount: str = typer.Option("", "--amount", "-a"), cent
 
 
 @app.command()
-def repay(loan_id: int, amount: str = typer.Option("", "--amount", "-a"), cents: int = typer.Option(0, "--cents")):
+def repay(
+    loan_id: int,
+    amount: str = typer.Option("", "--amount", "-a"),
+    cents: int = typer.Option(0, "--cents"),
+    note: str = typer.Option("", "--note", "-n"),
+):
     """Repay a loan (partial allowed)."""
     client = _load_client()
     try:
-        res = client.repay(loan_id, _amount_cents(amount, cents))
+        res = client.repay(loan_id, _amount_cents(amount, cents), note)
     except (ApiError, ValueError) as e:
         _die(e)
     typer.secho(

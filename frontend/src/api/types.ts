@@ -30,6 +30,8 @@ export interface AccountView {
   last_interest_at: string;
   created_at: string;
   next_day_interest_cents: number;
+  next_week_interest_cents: number;
+  next_year_interest_cents: number;
   savings_apr_percent: number;
   debt_cents: number;
   active_loans: number;

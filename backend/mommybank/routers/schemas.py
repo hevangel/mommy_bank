@@ -62,10 +62,12 @@ class AdjustIn(BaseModel):
 class BorrowIn(BaseModel):
     account_id: int
     amount_cents: int = Field(gt=0, le=2_000_000_000)
+    note: str = Field(default="", max_length=200)
 
 
 class RepayIn(BaseModel):
     amount_cents: int = Field(gt=0, le=2_000_000_000)
+    note: str = Field(default="", max_length=200)
 
 
 class SettingsPatchIn(BaseModel):

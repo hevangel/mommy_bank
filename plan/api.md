@@ -43,8 +43,8 @@ Roles: 🔑 admin only · 🙂 self (own account) · 👁 any authenticated user
 ### Loans
 | Method | Path | Role | Notes |
 |---|---|---|---|
-| POST | `/loans/borrow` | 🔑/self(`can_borrow`) | `{account_id, amount_cents}` — needs global `borrow_enabled`, respects debt cap |
-| POST | `/loans/{id}/repay` | 🔑/self | `{amount_cents}` — partial ok, uses money balance |
+| POST | `/loans/borrow` | 🔑/self(`can_borrow`) | `{account_id, amount_cents, note?}` — needs global `borrow_enabled`, respects debt cap |
+| POST | `/loans/{id}/repay` | 🔑/self | `{amount_cents, note?}` — partial ok, uses money balance |
 | GET | `/loans` | 🔑/self | `?account_id=` filter; outstanding accrues lazily |
 
 ### Settings & exchange rules
@@ -73,8 +73,8 @@ mommybank grant-time USERNAME --minutes 60
 mommybank deduct-time USERNAME --minutes 15
 mommybank convert USERNAME --dollars 2         # money→time at current rate (or --cents)
 mommybank quote                                # current exchange rate + rule
-mommybank borrow USERNAME --amount 10
-mommybank repay LOAN_ID --amount 5
+mommybank borrow USERNAME --amount 10 --note "new game"
+mommybank repay LOAN_ID --amount 5 --note "birthday money"
 mommybank loans [USERNAME]
 mommybank transactions USERNAME [--ledger money] [--limit 20]
 mommybank users                                # list

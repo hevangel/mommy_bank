@@ -38,6 +38,8 @@ const acct = (over: Partial<AccountView> = {}): AccountView => ({
   last_interest_at: "2026-08-01T00:00:00Z",
   created_at: "2026-01-01T00:00:00Z",
   next_day_interest_cents: 2,
+  next_week_interest_cents: 16,
+  next_year_interest_cents: 852,
   savings_apr_percent: 6.7,
   debt_cents: 0,
   active_loans: 0,
@@ -90,10 +92,12 @@ describe("LoginPage", () => {
 });
 
 describe("balance cards", () => {
-  it("shows money with tomorrow's interest", () => {
+  it("shows money with next week and next year interest", () => {
     render(<MoneyCard account={acct()} />);
     expect(screen.getByText("$123.45")).toBeInTheDocument();
-    expect(screen.getByText(/tomorrow/)).toBeInTheDocument();
+    expect(screen.getByText(/next week/)).toBeInTheDocument();
+    expect(screen.getByText(/next year/)).toBeInTheDocument();
+    expect(screen.queryByText(/tomorrow/)).not.toBeInTheDocument();
   });
 
   it("shows debt badge when kid owes money", () => {

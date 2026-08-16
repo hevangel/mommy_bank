@@ -1,0 +1,11 @@
+{
+  "name": "mommy-bank",
+  "plugins": [
+    {
+      "name": "mommy-bank",
+      "description": "Control the Mommy Bank family bank (pocket money & screen time) from your AI agent: MCP server + operator skill for deposits, screen-time exchange, interest, loans and family admin.",
+      "version": "1.0.0",
+      "source": "./plugins/mommy-bank"
+    }
+  ]
+}

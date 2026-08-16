@@ -1,0 +1,21 @@
+{
+  "name": "mommy-bank",
+  "version": "1.0.0",
+  "description": "Control the Mommy Bank family bank (pocket money & screen time): MCP server + agentic operator skill. Deposits, screen-time exchange with peak/off-peak rates, daily compound interest, loans, and family admin.",
+  "skills": ["skills/mommy-bank-control"],
+  "mcpServers": {
+    "mommybank": {
+      "command": "python",
+      "args": ["-m", "mommybank.mcp_server"]
+    }
+  },
+  "userConfig": {
+    "MOMMYBANK_URL": {
+      "type": "string",
+      "title": "Bank URL",
+      "description": "Base URL of the Mommy Bank API (default http://127.0.0.1:8971)",
+      "default": "http://127.0.0.1:8971",
+      "required": false
+    }
+  }
+}

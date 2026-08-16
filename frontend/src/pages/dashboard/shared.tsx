@@ -31,17 +31,25 @@ export function MoneyCard({
         format={(v) => formatMoney(v, symbol)}
         className={`mt-1 block font-extrabold text-ink ${big ? "text-5xl" : "text-3xl"}`}
       />
-      {account.next_day_interest_cents > 0 && (
-        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-xs font-bold text-mint-deep">
-          <IconSprout size={14} /> tomorrow +
-          {formatMoney(account.next_day_interest_cents, symbol)} · {account.savings_apr_percent}% APR daily
-        </p>
-      )}
-      {account.debt_cents > 0 && (
-        <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-xs font-bold text-lav-deep">
-          <IconRocket size={14} /> owes {formatMoney(account.debt_cents, symbol)}
-        </p>
-      )}
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {account.next_week_interest_cents > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-xs font-bold text-mint-deep">
+            <IconSprout size={14} /> next week +
+            {formatMoney(account.next_week_interest_cents, symbol)}
+          </span>
+        )}
+        {account.next_year_interest_cents > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-xs font-bold text-mint-deep">
+            <IconSprout size={14} /> next year +
+            {formatMoney(account.next_year_interest_cents, symbol)} · {account.savings_apr_percent}% APR
+          </span>
+        )}
+        {account.debt_cents > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 px-3 py-1 text-xs font-bold text-lav-deep">
+            <IconRocket size={14} /> owes {formatMoney(account.debt_cents, symbol)}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -199,6 +207,7 @@ export function LoansCard({
 }) {
   const toast = useToast();
   const [repay, setRepay] = useState<Record<number, string>>({});
+  const [repayNote, setRepayNote] = useState<Record<number, string>>({});
   const active = loans.filter((l) => l.status === "active");
 
   async function doRepay(loan: Loan) {
@@ -207,9 +216,13 @@ export function LoansCard({
     const cents = Math.round(parseFloat(t) * 100);
     setBusyId(loan.id);
     try {
-      await api.post(`/api/v1/loans/${loan.id}/repay`, { amount_cents: cents });
+      await api.post(`/api/v1/loans/${loan.id}/repay`, {
+        amount_cents: cents,
+        note: (repayNote[loan.id] ?? "").trim(),
+      });
       toast(`Repaid $${t} 🙏`);
       setRepay((r) => ({ ...r, [loan.id]: "" }));
+      setRepayNote((r) => ({ ...r, [loan.id]: "" }));
       onChanged();
     } catch (err) {
       toast(err instanceof Error ? err.message : "Repay failed", "err");
@@ -235,13 +248,19 @@ export function LoansCard({
                 {formatMoney(loan.next_day_interest_cents)}/day
               </span>
             </div>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               <input
                 className="input !w-32 !py-2 text-sm"
                 inputMode="decimal"
                 placeholder="$ pay back"
                 value={repay[loan.id] ?? ""}
                 onChange={(e) => setRepay((r) => ({ ...r, [loan.id]: e.target.value }))}
+              />
+              <input
+                className="input !min-w-36 flex-1 !py-2 text-sm"
+                placeholder="note (optional)"
+                value={repayNote[loan.id] ?? ""}
+                onChange={(e) => setRepayNote((r) => ({ ...r, [loan.id]: e.target.value }))}
               />
               <button
                 className="btn-mint !py-2 text-sm"
@@ -269,6 +288,7 @@ export function BorrowCard({
 }) {
   const toast = useToast();
   const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const cents = useMemo(() => {
     const t = amount.trim().replace(/^\$/, "");
@@ -280,9 +300,12 @@ export function BorrowCard({
     if (!cents) return;
     setBusy(true);
     try {
-      await api.post("/api/v1/loans/borrow", { account_id: account.id, amount_cents: cents });
+      await api.post("/api/v1/loans/borrow", {
+        account_id: account.id, amount_cents: cents, note: note.trim(),
+      });
       toast(`Borrowed $${amount} — remember it grows every day! 🚀`);
       setAmount("");
+      setNote("");
       onDone();
     } catch (err) {
       toast(err instanceof Error ? err.message : "Borrow failed", "err");
@@ -301,13 +324,19 @@ export function BorrowCard({
         {quote.borrow_apr_percent}% APR, added to your debt every day. You can borrow up to{" "}
         {formatMoney(limitLeft)} more.
       </p>
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
         <input
-          className="input !w-32"
+          className="input !w-28"
           inputMode="decimal"
           placeholder="$ amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
+        />
+        <input
+          className="input !min-w-36 flex-1"
+          placeholder="what's it for? (optional)"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
         />
         <button className="btn-mint" disabled={!cents || busy || cents > limitLeft} onClick={doBorrow}>
           {busy ? "Borrowing…" : "Borrow 🚀"}

@@ -129,11 +129,13 @@ class MommyBankClient:
         return self.get(f"/api/v1/accounts/{account_id}/transactions", params)
 
     # ------------------------------------------------------------ loans
-    def borrow(self, account_id: int, amount_cents: int) -> dict:
-        return self.post("/api/v1/loans/borrow", {"account_id": account_id, "amount_cents": amount_cents})
+    def borrow(self, account_id: int, amount_cents: int, note: str = "") -> dict:
+        return self.post("/api/v1/loans/borrow", {
+            "account_id": account_id, "amount_cents": amount_cents, "note": note,
+        })
 
-    def repay(self, loan_id: int, amount_cents: int) -> dict:
-        return self.post(f"/api/v1/loans/{loan_id}/repay", {"amount_cents": amount_cents})
+    def repay(self, loan_id: int, amount_cents: int, note: str = "") -> dict:
+        return self.post(f"/api/v1/loans/{loan_id}/repay", {"amount_cents": amount_cents, "note": note})
 
     def loans(self, account_id: int | None = None) -> list:
         params = {"account_id": account_id} if account_id is not None else None

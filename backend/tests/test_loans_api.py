@@ -123,3 +123,33 @@ def test_kid_cannot_borrow_for_other(client, admin_headers, make_kid):
     r = client.post("/api/v1/loans/borrow",
                     json={"account_id": b["account_id"], "amount_cents": 100}, headers=a["headers"])
     assert r.status_code == 403
+
+
+def test_borrow_repay_notes_recorded(client, admin_headers, make_kid):
+    _enable_borrowing(client, admin_headers)
+    kid = make_kid(can_borrow=True)
+    acct = kid["account_id"]
+    loan_id = client.post("/api/v1/loans/borrow",
+                          json={"account_id": acct, "amount_cents": 1000, "note": "new game"},
+                          headers=kid["headers"]).json()["id"]
+    txs = client.get(f"/api/v1/accounts/{acct}/transactions",
+                     params={"ledger": "money"}, headers=kid["headers"]).json()
+    borrow_tx = next(t for t in txs if t["kind"] == "borrow")
+    assert "new game" in borrow_tx["note"]
+    assert f"Loan #{loan_id}" in borrow_tx["note"]
+
+    client.post(f"/api/v1/accounts/{acct}/deposit", json={"amount_cents": 1000}, headers=admin_headers)
+    client.post(f"/api/v1/loans/{loan_id}/repay",
+                json={"amount_cents": 400, "note": "birthday money"}, headers=kid["headers"])
+    txs = client.get(f"/api/v1/accounts/{acct}/transactions",
+                     params={"ledger": "money"}, headers=kid["headers"]).json()
+    repay_tx = next(t for t in txs if t["kind"] == "repay")
+    assert "birthday money" in repay_tx["note"]
+    assert f"Repay loan #{loan_id}" in repay_tx["note"]
+
+    # without a note the system text is still recorded
+    client.post(f"/api/v1/loans/{loan_id}/repay", json={"amount_cents": 100}, headers=kid["headers"])
+    txs = client.get(f"/api/v1/accounts/{acct}/transactions",
+                     params={"ledger": "money"}, headers=kid["headers"]).json()
+    repay_tx = next(t for t in txs if t["kind"] == "repay" and t["id"] != repay_tx["id"])
+    assert repay_tx["note"] == f"Repay loan #{loan_id}"

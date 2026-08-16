@@ -18,7 +18,13 @@ def total_outstanding(db: Session, account: Account, now=None) -> int:
     return total
 
 
-def borrow(db: Session, account: Account, amount_cents: int, actor: User, now=None) -> Loan:
+def _tx_note(system: str, note: str) -> str:
+    return f"{system} — {note}" if note else system
+
+
+def borrow(
+    db: Session, account: Account, amount_cents: int, actor: User, now=None, note: str = "",
+) -> Loan:
     now = now or utcnow()
     if amount_cents <= 0:
         raise BankError("Amount must be positive")
@@ -45,17 +51,20 @@ def borrow(db: Session, account: Account, amount_cents: int, actor: User, now=No
     db.flush()
     ledger.append_tx(
         db, account, "money", "borrow", amount_cents,
-        note=f"Loan #{loan.id} received", created_by=actor.id, meta={"loan_id": loan.id},
+        note=_tx_note(f"Loan #{loan.id} received", note), created_by=actor.id,
+        meta={"loan_id": loan.id},
     )
     ledger.append_tx(
         db, account, "debt", "borrow", amount_cents,
-        note=f"Loan #{loan.id} opened", created_by=actor.id,
+        note=_tx_note(f"Loan #{loan.id} opened", note), created_by=actor.id,
         meta={"loan_id": loan.id, "apr_percent": apr}, balance_after=loan.outstanding_cents,
     )
     return loan
 
 
-def repay(db: Session, loan: Loan, amount_cents: int, actor: User, now=None) -> int:
+def repay(
+    db: Session, loan: Loan, amount_cents: int, actor: User, now=None, note: str = "",
+) -> int:
     """Repay up to min(requested, outstanding, available money). Returns cents repaid."""
     now = now or utcnow()
     if amount_cents <= 0:
@@ -70,11 +79,12 @@ def repay(db: Session, loan: Loan, amount_cents: int, actor: User, now=None) -> 
     loan.outstanding_cents -= effective
     ledger.append_tx(
         db, account, "money", "repay", -effective,
-        note=f"Repay loan #{loan.id}", created_by=actor.id, meta={"loan_id": loan.id},
+        note=_tx_note(f"Repay loan #{loan.id}", note), created_by=actor.id,
+        meta={"loan_id": loan.id},
     )
     ledger.append_tx(
         db, account, "debt", "repay", -effective,
-        note=f"Repay loan #{loan.id}", created_by=actor.id,
+        note=_tx_note(f"Repay loan #{loan.id}", note), created_by=actor.id,
         meta={"loan_id": loan.id}, balance_after=loan.outstanding_cents,
     )
     if loan.outstanding_cents == 0:

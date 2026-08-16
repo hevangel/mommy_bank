@@ -1,0 +1,18 @@
+services:
+  mommybank:
+    build: .
+    image: mommybank:latest
+    container_name: mommybank
+    # host 8971 -> container 8000 (change the left side if 8971 is taken)
+    ports:
+      - "8971:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      # set real values in .env or here — never commit real passwords
+      MOMMYBANK_ADMIN_PASSWORD: ${MOMMYBANK_ADMIN_PASSWORD:-}
+      MOMMYBANK_SECRET: ${MOMMYBANK_SECRET:-}
+      MOMMYBANK_SEED_DEMO: ${MOMMYBANK_SEED_DEMO:-0}
+      MOMMYBANK_DEMO_PASSWORD: ${MOMMYBANK_DEMO_PASSWORD:-}
+      TZ: ${TZ:-UTC}
+    restart: unless-stopped

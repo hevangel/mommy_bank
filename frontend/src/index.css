@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-cream text-ink antialiased;
+  }
+  #root {
+    min-height: 100vh;
+  }
+  ::selection {
+    @apply bg-piggy/30;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 font-bold
+      transition-all duration-150 active:translate-y-0.5 disabled:opacity-40
+      disabled:pointer-events-none focus:outline-none focus-visible:ring-4 focus-visible:ring-piggy/30;
+  }
+  .btn-primary {
+    @apply btn bg-piggy text-white shadow-pop hover:bg-piggy-deep;
+  }
+  .btn-mint {
+    @apply btn bg-mint text-white shadow-pop hover:bg-mint-deep;
+  }
+  .btn-sky {
+    @apply btn bg-sky text-white shadow-pop hover:bg-sky-deep;
+  }
+  .btn-ghost {
+    @apply btn bg-white text-ink shadow-soft ring-1 ring-ink/10 hover:bg-piggysoft;
+  }
+  .btn-danger {
+    @apply btn bg-white text-red-500 ring-1 ring-red-200 hover:bg-red-50;
+  }
+  .card {
+    @apply rounded-3xl bg-white p-5 shadow-soft ring-1 ring-ink/5;
+  }
+  .input {
+    @apply w-full rounded-2xl border-0 bg-white px-4 py-3 text-ink shadow-inner
+      ring-1 ring-ink/10 placeholder:text-ink/35 focus:outline-none focus:ring-4 focus:ring-piggy/25;
+  }
+  .label {
+    @apply mb-1 block text-sm font-bold text-ink/70;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .page-title {
+    @apply text-2xl font-extrabold tracking-tight sm:text-3xl;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
